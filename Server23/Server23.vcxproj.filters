@@ -13,10 +13,48 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Исходные файлы\Room">
+      <UniqueIdentifier>{9fcacedf-1094-4729-a207-1f5d5ce226fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Room">
+      <UniqueIdentifier>{1227371c-2fbe-4fca-b7c7-b80987b2e7ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Server">
+      <UniqueIdentifier>{dc48783c-39f5-462c-9d4b-a354496a0dc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Server">
+      <UniqueIdentifier>{9c399c10-939f-4ef7-9e1c-db16f95b21d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Data">
+      <UniqueIdentifier>{ec9e4822-d9f5-41c0-9b27-76d94871f85b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Data">
+      <UniqueIdentifier>{32f2d7be-b9c2-4e9b-9c15-7be55d2d1826}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="ServerManager.cpp">
+      <Filter>Исходные файлы\Server</Filter>
+    </ClCompile>
+    <ClCompile Include="DataClient.cpp">
+      <Filter>Исходные файлы\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="RoomManager.cpp">
+      <Filter>Исходные файлы\Room</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ServerManager.h">
+      <Filter>Файлы заголовков\Server</Filter>
+    </ClInclude>
+    <ClInclude Include="DataClient.h">
+      <Filter>Файлы заголовков\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="RoomManager.h">
+      <Filter>Файлы заголовков\Room</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

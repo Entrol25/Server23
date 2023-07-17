@@ -19,7 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DataClient.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RoomManager.cpp" />
+    <ClCompile Include="ServerManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DataClient.h" />
+    <ClInclude Include="RoomManager.h" />
+    <ClInclude Include="ServerManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
