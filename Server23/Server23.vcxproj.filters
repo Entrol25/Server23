@@ -45,6 +45,9 @@
     <ClCompile Include="RoomManager.cpp">
       <Filter>Исходные файлы\Room</Filter>
     </ClCompile>
+    <ClCompile Include="Room.cpp">
+      <Filter>Исходные файлы\Room</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ServerManager.h">
@@ -54,6 +57,9 @@
       <Filter>Файлы заголовков\Data</Filter>
     </ClInclude>
     <ClInclude Include="RoomManager.h">
+      <Filter>Файлы заголовков\Room</Filter>
+    </ClInclude>
+    <ClInclude Include="Room.h">
       <Filter>Файлы заголовков\Room</Filter>
     </ClInclude>
   </ItemGroup>

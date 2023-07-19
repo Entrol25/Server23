@@ -29,12 +29,13 @@ void SendMessageToClient(int ID)// ф. рассылает всем сообще�
 {
 #pragma region Region2 //---------------------------------
 
+	short numRoom = -1;
 	bool wait = true;
 	bool setBrigade = false;
 	//
 	short players = 0;
-	int const maxPlayers = 2;
-	short brigade[2] = {};// ID
+	//int const maxPlayers = 2;
+	short brigade[2];// ID
 	//
 	int sizeBuffer = 0;
 	string status = "-:-";// 0 connect, 1 connect, 2 room onliyne game
@@ -53,7 +54,7 @@ void SendMessageToClient(int ID)// ф. рассылает всем сообще�
 	{
 		if (recv(Connections[ID], buffer, 1024, NULL))// получить сообщение от игрока[ID]
 		{
-			cout << "..................................................................................." << endl;
+			cout << "............................................................................." << endl;
 			cout << "id = " << ID << " buffer = " << buffer << endl;// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			status = serverManager.Status(buffer);// получить статус 
 			if (status == "room")// 
@@ -81,16 +82,37 @@ void SendMessageToClient(int ID)// ф. рассылает всем сообще�
 			else if (status == "2:2")// войти в room onliyne game
 			{
 				cout << "id = " << ID << " status = " << status << endl;
-				//cout << "setBrigade = " << setBrigade << endl;
-				/*
 				if (setBrigade == false)// первый запрос в комнату. по умолчанию
 				{
 					setBrigade = true;
-					//cout << "id = " << ID << " setBrigade = true; = " << setBrigade << endl;
+					// в очередь в комнату
+					roomManager.SetBrigade(ID, players, numRoom);// players, numRoom / return >>>>>>>>>>>>>
 				}
-				serverManager.Response_2(response);
-				send(Connections[ID], response, strlen(response), NULL);// отправить сообщение игроку[i]
-				*/
+				if (wait == true)// по умолчанию
+				{
+					roomManager.GetWaitRoom(wait, numRoom);// свободная комната. ожидание игроков.
+				}
+				if (wait == false)// дождались всех игроков
+				{
+					for (short i = 0; i < players; i++) { brigade[i] = -2; }// чистим
+
+					roomManager.GetBrigade(brigade, numRoom);// получить ID игроков комнаты
+
+					for (short i = 0; i < players; i++)
+					{ cout << "id = " << ID << " brigade[" << i << "] = " << brigade[i] << endl; }
+
+					serverManager.Response(response);
+					send(Connections[ID], response, strlen(response), NULL);// отправить сообщение игроку[i]
+				}
+				if (wait == true)// по умолчанию. неудачная попытка
+				{
+					status == "1:1";
+					cout << "id = " << ID << " status = " << status << endl;
+
+					serverManager.SetStatus(status, response);
+					send(Connections[ID], response, strlen(response), NULL);// отправить сообщение игроку[i]
+				}
+				/*
 				if (setBrigade == false)// первый запрос в комнату. по умолчанию
 				{
 					setBrigade = true;
@@ -118,6 +140,7 @@ void SendMessageToClient(int ID)// ф. рассылает всем сообще�
 					serverManager.SetStatus(status, response);
 					send(Connections[ID], response, strlen(response), NULL);// отправить сообщение игроку[i]
 				}
+				*/
 				cout << "id = " << ID << " wait = " << wait << endl;
 			}
 		}
