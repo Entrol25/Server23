@@ -21,11 +21,15 @@ float 4 байта (32 бита). 3,4E +/- 38 (7 знаков)
 double 8 байт (64 бит). 1,7E +/- 308 (15 знаков)
 */
 SOCKET Connect;// создание сокета. приём подключаемых пользователей и передавать в большую коллекцию сокетов.
+// Connections[ClientCount], Connections[ID].
 SOCKET* Connections;// коллекция сокетов. все пользователи подкл. к серверу.
 SOCKET Listen;// сокет для подключкния
-int ClientCount = -1;// подключённые клиенты
+short ClientCount = -1;// подключённые клиенты
+//
+const short maxShort = 32767;
+short freeSocket[maxShort];// ID свободных сокетов
 
-void SendMessageToClient(int ID)// ф. рассылает всем сообщения
+void SendMessageToClient(short ID)// ф. рассылает всем сообщения 
 {
 #pragma region Region2 //---------------------------------
 
@@ -37,10 +41,10 @@ void SendMessageToClient(int ID)// ф. рассылает всем сообще�
 	//int const maxPlayers = 2;
 	short brigade[2];// ID
 	//
-	int sizeBuffer = 0;
+	short sizeBuffer = 0;
 	string status = "-:-";// 0 connect, 1 connect, 2 room onliyne game
 	char buffer[1024] = {};// создать временный буфер для сообщения
-	char response[5] = {};// ответ
+	char response[6] = {};// ответ
 
 	ServerManager serverManager;//
 	DataClient dataClient;// 
@@ -48,7 +52,7 @@ void SendMessageToClient(int ID)// ф. рассылает всем сообще�
 
 #pragma endregion
 
-	for (int i = 0; i < 1024; i++) { buffer[i] = '\0'; }// чистим буфер
+	for (short i = 0; i < 1024; i++) { buffer[i] = '\0'; }// чистим буфер
 
 	for (;;)// for (;; Sleep(75))
 	{
@@ -57,20 +61,21 @@ void SendMessageToClient(int ID)// ф. рассылает всем сообще�
 			cout << "............................................................................." << endl;
 			cout << "id = " << ID << " buffer = " << buffer << endl;// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 			status = serverManager.Status(buffer);// получить статус 
+			//**********************************************************************************************
 			if (status == "room")// 
 			{
 				cout << "id = " << ID << " status = " << status << endl;
 				sizeBuffer = serverManager.WorkVector3(buffer);// получить длинну для временного буфера bufferRoom[]
 
 				char* bufferRoom = new char[sizeBuffer];// создать временный буфер для сообщения
-				for (int i = 0; i < sizeBuffer; i++) { bufferRoom[i] = '`'; }// чистим буфер для сообщения
+				for (short i = 0; i < sizeBuffer; i++) { bufferRoom[i] = '`'; }// чистим буфер для сообщения
 
 				serverManager.WorkVector3(sizeBuffer, bufferRoom, buffer);// заполняем временный буфер для сообщения
 
 				send(Connections[ID], bufferRoom, strlen(bufferRoom), NULL);// отправить сообщение игроку[i]
 				delete[] bufferRoom;
 
-			}
+			}//*********************************************************************************************
 			else if (status == "1:1")// подключился к SendMessageToClient()
 			{
 				cout << "id = " << ID << " status = " << status << endl;
@@ -78,7 +83,7 @@ void SendMessageToClient(int ID)// ф. рассылает всем сообще�
 
 				serverManager.Response(response);
 				send(Connections[ID], response, strlen(response), NULL);// отправить сообщение игроку[i]
-			}
+			}//*********************************************************************************************
 			else if (status == "2:2")// войти в room onliyne game
 			{
 				cout << "id = " << ID << " status = " << status << endl;
@@ -112,48 +117,31 @@ void SendMessageToClient(int ID)// ф. рассылает всем сообще�
 					serverManager.SetStatus(status, response);
 					send(Connections[ID], response, strlen(response), NULL);// отправить сообщение игроку[i]
 				}
-				/*
-				if (setBrigade == false)// первый запрос в комнату. по умолчанию
-				{
-					setBrigade = true;
-					RoomManager::SetBrigade(ID, players);// players;// return >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-				}
-				if (wait == true)// по умолчанию
-				{
-					wait = roomManager.GetWaitRoom();// ждать игроков
-				}
-				if (wait == false)// дождались всех игроков
-				{
-					for (short i = 0; i < players; i++) { brigade[i] = -2; }// чистим
-					roomManager.GetBrigade(brigade);
-					for (short i = 0; i < players; i++)
-					{
-						cout << "id = " << ID << " brigade[" << i << "] = " << brigade[i] << endl;
-					}
-					serverManager.Response(response);
-					send(Connections[ID], response, strlen(response), NULL);// отправить сообщение игроку[i]
-				}
-				if (wait == true)// по умолчанию. неудачная попытка
-				{
-					status == "1:1";
-					cout << "id = " << ID << " status = " << status << endl;
-					serverManager.SetStatus(status, response);
-					send(Connections[ID], response, strlen(response), NULL);// отправить сообщение игроку[i]
-				}
-				*/
 				cout << "id = " << ID << " wait = " << wait << endl;
+			}//*********************************************************************************************
+			else if (status == "0:0")// выход. Unity
+			{
+				cout << "id = " << ID << " status = " << status << endl;
+				serverManager.Response(response);
+				send(Connections[ID], response, strlen(response), NULL);// отправить сообщение игроку[i]
+
+				shutdown(Connections[ID], SD_BOTH);// SD_BOTH - прекратить отправку и приём
+				closesocket(Connections[ID]);// закрыть сокет 
+				freeSocket[ID] = -1;// ID свободных сокетов
+				ExitThread(0);// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			}
 		}
-		for (int i = 0; i < 1024; i++) { buffer[i] = '\0'; }// чистим буфер
+		for (short i = 0; i < 1024; i++) { buffer[i] = '\0'; }// чистим буфер
 	}
 }
-int StartServer()
+short StartServer()
 {
 #pragma region Region1 //--------------------------------
 
 	WSAData data;// переменная
 	WORD version = MAKEWORD(2, 2);// верси сокетов 
-	int res = WSAStartup(version, &data);// инициализация сокетов 
+	short res = WSAStartup(version, &data);// инициализация сокетов 
+
 	if (res != 0)// если не иниц. сокет 
 	{
 		printf("res != 0");
@@ -162,8 +150,6 @@ int StartServer()
 
 	struct addrinfo hints;// 
 	struct addrinfo* result;// для работы сокетов 
-
-
 
 	Connections = (SOCKET*)calloc(64, sizeof(SOCKET));// иниц. массива - коллекции
 
@@ -182,8 +168,11 @@ int StartServer()
 
 	listen(Listen, SOMAXCONN);// дать сокет который ждёт подключение listen(Listen, максимум подключившихся);
 	freeaddrinfo(result);// удалить инфу т.к. сокеты уже настроены
-	//char m_connect[] = "Connect...;;;5";// переменная -> отправить клиенту о удачном подкл. к серверу
+	
 #pragma endregion
+
+	for (short i = 0; i < maxShort; i++)// инициализация ID свободных сокетов
+	{ freeSocket[i] = -1; }// NULL
 
 	char m_connect[] = { '*','0',':','0','`','\0' };// переменная -> отправить клиенту о удачном подкл. к серверу
 	printf("Start server...\n");// сообщение на сервер
@@ -192,23 +181,20 @@ int StartServer()
 	{
 		if (Connect = accept(Listen, NULL, NULL))// ждёт подкл. от клиента
 		{
-			//~~~~~~~~~~~~~~~ s 107 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-			/*u_long _nB = (u_long)1;
-			int _notBlock = ioctlsocket(Connect, FIONBIO, &_nB);*/
-			/*if (_notBlock == SOCKET_ERROR)
-			{ printf("SOCKET_ERROR\n"); }
-			else { printf("SOCKET NotBlock\n"); }*/
-			//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			ClientCount++;// + 1 клиент 
+			for (short i = 0; i < maxShort; i++)// ищем свободный - ID свободных сокетов
+			{
+				if (freeSocket[i] == -1)// ID свободный сокет
+				{
+					ClientCount = i;
+					freeSocket[ClientCount] = ClientCount;// занятый - ID свободных сокетов
+					break;
+				}
+			}
+
 			Connections[ClientCount] = Connect;// сохранить сокет клиента
 			send(Connections[ClientCount], m_connect, strlen(m_connect), NULL);// отправить клиенту сообщение
-			CreateThread(// создать поток
-				NULL,
-				NULL,
-				(LPTHREAD_START_ROUTINE)SendMessageToClient,
-				(LPVOID)(ClientCount),
-				NULL,
-				NULL);
+			// создать поток
+			CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)SendMessageToClient, (LPVOID)(ClientCount), NULL, NULL);
 		}
 	}
 }

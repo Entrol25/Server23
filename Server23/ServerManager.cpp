@@ -1,6 +1,6 @@
 ﻿#include "ServerManager.h"
 
-int ServerManager::WorkVector3(char buffer[])// получить длинну для временного буфера bufferRoom[]
+short ServerManager::WorkVector3(char buffer[])// получить длинну для временного буфера bufferRoom[]
 {
 	//cout << "room = " << buffer << endl;// room = *2:2:2,27:0,01`
 	for (short i = 0; i < 1024; i++)// for (int i = 0; i < sizeof(buffer); i++)
@@ -24,7 +24,7 @@ int ServerManager::WorkVector3(char buffer[])// получить длинну д
 	return 0;
 }
 // заполняем временный буфер для сообщения
-void ServerManager::WorkVector3(int _sizeBuffer, char bufferRoom[], char buffer[])
+void ServerManager::WorkVector3(short _sizeBuffer, char bufferRoom[], char buffer[])
 {
 	for (short i = 0; i < _sizeBuffer; i++)
 	{
@@ -70,6 +70,11 @@ string ServerManager::Status(char buffer[])// получить статус
 		{
 			_status = "room";
 			return _status;
+		}// понижение ********************************
+		else if (buffer[3] == '0')// выход. Unity
+		{
+			_status = "0:0";
+			return _status;
 		}
 		else
 		{
@@ -87,7 +92,7 @@ string ServerManager::Status(char buffer[])// получить статус
 		{
 			_status = "room";
 			return _status;
-		}
+		}// понижение ********************************
 		else if (buffer[1] == '2' && buffer[3] == '1')// выйти из Room Online Game
 		{
 			_status = "1:1";
@@ -112,7 +117,7 @@ void ServerManager::SetStatus(string _st, char res[])
 }
 void ServerManager::Response(char res[])// подключился к SendMessageToClient()
 {
-	if (_status == "1:1")
+	if (_status == "1:1")// Accaunt
 	{
 		res[0] = '*';
 		res[1] = '1';
@@ -120,7 +125,7 @@ void ServerManager::Response(char res[])// подключился к SendMessage
 		res[3] = '1';
 		res[4] = '`';
 	}
-	else if (_status == "2:2")
+	else if (_status == "2:2")// Room Online Game
 	{
 		res[0] = '*';
 		res[1] = '2';
@@ -128,15 +133,13 @@ void ServerManager::Response(char res[])// подключился к SendMessage
 		res[3] = '2';
 		res[4] = '`';
 	}
+	else if (_status == "0:0")// выход. Unity
+	{
+		res[0] = '*';
+		res[1] = '0';
+		res[2] = ':';
+		res[3] = '0';
+		res[4] = 'x';
+		res[5] = '`';
+	}
 }
-//void ServerManager::Response_2(char res[])// войти в room onliyne game
-//{
-//	if (_status == "2:2")
-//	{
-//		res[0] = '*';
-//		res[1] = '2';
-//		res[2] = ':';
-//		res[3] = '2';
-//		res[4] = '`';
-//	}
-//}
