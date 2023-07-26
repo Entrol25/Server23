@@ -31,7 +31,7 @@ short freeSocket[maxShort];// ID свободных сокетов
 
 void SendMessageToClient(short ID)// ф. рассылает всем сообщения 
 {
-#pragma region Region2 //---------------------------------
+#pragma region Region2 //-------------------------------------------------------------------------------------------
 
 	short numRoom = -1;
 	bool wait = true;
@@ -45,6 +45,7 @@ void SendMessageToClient(short ID)// ф. рассылает всем сообщ�
 	string status = "-:-";// 0 connect, 1 connect, 2 room onliyne game
 	char buffer[1024] = {};// создать временный буфер для сообщения
 	char response[6] = {};// ответ
+	bool login = false;
 
 	ServerManager serverManager;//
 	DataClient dataClient;// 
@@ -76,11 +77,15 @@ void SendMessageToClient(short ID)// ф. рассылает всем сообщ�
 				delete[] bufferRoom;
 
 			}//*********************************************************************************************
-			else if (status == "1:1")// подключился к SendMessageToClient()
+			else if (status == "1:1")// подключился к SendMessageToClient() || выйти из Room Online Game
 			{
 				cout << "id = " << ID << " status = " << status << endl;
-				dataClient.SetLogin(buffer);// Login <<<<<<<<<<<<<<
 
+				if (login == false)
+				{
+					login = true;
+					dataClient.SetLogin(buffer);// Login <<<<<<<<<<<<<<
+				}
 				serverManager.Response(response);
 				send(Connections[ID], response, strlen(response), NULL);// отправить сообщение игроку[i]
 			}//*********************************************************************************************

@@ -14,15 +14,23 @@ RoomManager::RoomManager()// конструктор
 		_classID = room[i].GetClassID();// Debug
 		cout << "\t0) _classID = " << _classID << endl;
 	}
+	for (short i = 0; i < rooms; i++)// Debug
+	{
+		bool _wait = true;
+		room[i].GetWaitRoom(_wait);
+		cout << "\t5) classID = " << room[i].GetClassID() << " wait = " << _wait << endl;
+	}
 }
 //-------------------------------------------------------
 void RoomManager::SetBrigade(short _myId, short& _players, short& _numRoom)// в очередь в комнату
 {
-	bool _wait = false;
+	bool _wait = true;
 
 	for (short i = 0; i < rooms; i++)// SetClassID
 	{
 		room[i].GetWaitRoom(_wait);// свободная комната. ожидание игроков. 
+
+		cout << "\t \t 3.1) _wait = " << _wait << endl;
 
 		if (_wait == true)// свободная комната. ожидание игроков. 
 		{
@@ -38,5 +46,12 @@ void RoomManager::GetWaitRoom(bool& _wait, short& _numRoom)// свободная
 }
 void RoomManager::GetBrigade(short _brigade[], short& _numRoom)// получить ID игроков комнаты
 {
-	room[_numRoom].GetBrigade(_brigade);
+	room[_numRoom].GetBrigade(_brigade);// получить ID игроков комнаты
+
+	for (short i = 0; i < rooms; i++)// Debug
+	{
+		bool _wait = true;
+		room[i].GetWaitRoom(_wait);
+		cout << "\t \t 5.1) classID = " << room[i].GetClassID() << " wait = " << _wait << endl;
+	}
 }
